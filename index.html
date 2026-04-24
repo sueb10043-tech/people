@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>우리나라 돈과 위인 알아보기</title>
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Nanum+Gothic:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FFFDF0;
+    --text: #333;
+    --card-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    --radius: 24px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Jua', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  header {
+    background: linear-gradient(135deg, #FFE066 0%, #FFA94D 50%, #FF6B6B 100%);
+    padding: 24px 20px 20px;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  header h1 {
+    font-size: clamp(22px, 5vw, 38px);
+    color: #fff;
+    text-shadow: 3px 3px 0 rgba(0,0,0,0.15);
+  }
+
+  header p {
+    font-size: clamp(13px, 2.5vw, 17px);
+    color: rgba(255,255,255,0.9);
+    margin-top: 4px;
+  }
+
+  .tab-bar {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    padding: 20px 16px 0;
+    flex-wrap: wrap;
+  }
+
+  .tab-btn {
+    font-family: 'Jua', sans-serif;
+    font-size: clamp(15px, 3vw, 20px);
+    padding: 12px 28px;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.25s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+
+  .tab-btn.money  { background: #fff; color: #FF8C00; border: 3px solid #FFD700; }
+  .tab-btn.heroes { background: #fff; color: #4CAF50; border: 3px solid #4CAF50; }
+
+  .tab-btn.active.money  { background: linear-gradient(135deg, #FFD700, #FFA94D); color: #fff; border-color: transparent; transform: translateY(-3px); box-shadow: 0 8px 20px rgba(255,165,0,0.4); }
+  .tab-btn.active.heroes { background: linear-gradient(135deg, #66BB6A, #26A69A); color: #fff; border-color: transparent; transform: translateY(-3px); box-shadow: 0 8px 20px rgba(76,175,80,0.4); }
+
+  .content {
+    max-width: 1100px;
+    margin: 28px auto;
+    padding: 0 16px 60px;
+  }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; animation: fadeIn 0.4s ease; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .section-title-wrap { text-align: center; margin-bottom: 28px; }
+
+  .section-title {
+    font-size: clamp(20px, 4vw, 28px);
+    padding: 14px 32px;
+    border-radius: 50px;
+    display: inline-block;
+  }
+
+  .section-title.orange { background: linear-gradient(135deg, #FFD700, #FFA94D); color: #fff; box-shadow: 0 4px 16px rgba(255,165,0,0.3); }
+  .section-title.green  { background: linear-gradient(135deg, #66BB6A, #26A69A); color: #fff; box-shadow: 0 4px 16px rgba(76,175,80,0.3); }
+
+  /* ── MONEY ── */
+  .money-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px;
+  }
+
+  .money-card {
+    background: #fff;
+    border-radius: var(--radius);
+    box-shadow: var(--card-shadow);
+    overflow: hidden;
+    transition: transform 0.25s;
+  }
+
+  .money-card:hover { transform: translateY(-6px); }
+
+  .money-top {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 20px 16px;
+  }
+
+  .money-img-box {
+    width: 110px;
+    height: 130px;
+    flex-shrink: 0;
+    border-radius: 12px;
+    background: #F5F5F5;
+    border: 2px dashed #ddd;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #bbb;
+    font-size: 11px;
+    text-align: center;
+    gap: 6px;
+    overflow: hidden;
+  }
+
+  .money-img-box img { width: 100%; height: 100%; object-fit: cover; border-radius: 10px; }
+
+  .money-info { flex: 1; }
+  .money-amount { font-size: clamp(22px, 4vw, 28px); color: #FF8C00; margin-bottom: 6px; }
+  .money-name   { font-size: clamp(18px, 3vw, 22px); color: #222; margin-bottom: 8px; }
+  .money-period {
+    font-size: 13px; color: #888;
+    background: #F5F5F5; padding: 3px 12px;
+    border-radius: 20px; display: inline-block;
+  }
+
+  .money-body { padding: 14px 20px 20px; border-top: 2px dashed #eee; }
+
+  .money-achievement {
+    background: #FFF9E6;
+    border-left: 4px solid #FFD700;
+    padding: 12px 14px;
+    border-radius: 0 12px 12px 0;
+    font-size: clamp(13px, 2vw, 15px);
+    line-height: 1.7;
+    color: #555;
+    margin-bottom: 12px;
+  }
+
+  .money-fun {
+    background: #E8F5E9;
+    border-radius: 12px;
+    padding: 10px 14px;
+    font-size: clamp(12px, 1.8vw, 14px);
+    color: #388E3C;
+  }
+
+  .money-fun::before { content: "💡 "; }
+
+  .coin-section { margin-top: 32px; }
+
+  .coin-section-title {
+    font-size: 20px; color: #FF8C00;
+    margin-bottom: 16px; padding-bottom: 8px;
+    border-bottom: 2px dashed #FFD700;
+  }
+
+  .coins-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+  }
+
+  .coin-card-item {
+    background: #fff; border-radius: 20px;
+    box-shadow: var(--card-shadow); overflow: hidden;
+    transition: transform 0.25s;
+  }
+
+  .coin-card-item:hover { transform: translateY(-4px); }
+
+  .coin-top { display: flex; align-items: center; gap: 12px; padding: 16px 16px 12px; }
+
+  .coin-img-box {
+    width: 68px; height: 68px; flex-shrink: 0;
+    border-radius: 50%; background: #F5F5F5;
+    border: 2px dashed #ddd;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    color: #bbb; font-size: 10px; text-align: center; overflow: hidden;
+  }
+
+  .coin-img-box img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+
+  .coin-info { flex: 1; }
+  .coin-amount  { font-size: 20px; color: #FF8C00; }
+  .coin-subject { font-size: 13px; color: #888; }
+
+  .coin-body {
+    padding: 10px 16px 16px;
+    border-top: 2px dashed #eee;
+    font-size: 13px; color: #555; line-height: 1.7;
+  }
+
+  /* ── HEROES ── */
+  .heroes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 20px;
+  }
+
+  .hero-card {
+    background: #fff;
+    border-radius: var(--radius);
+    box-shadow: var(--card-shadow);
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.25s, box-shadow 0.25s;
+  }
+
+  .hero-card::before { content: ''; display: block; height: 6px; }
+  .hero-card.cat1::before { background: linear-gradient(90deg, #FF6B6B, #FF8E53); }
+  .hero-card.cat2::before { background: linear-gradient(90deg, #4ECDC4, #44A08D); }
+  .hero-card.cat3::before { background: linear-gradient(90deg, #A18CD1, #FBC2EB); }
+  .hero-card.cat4::before { background: linear-gradient(90deg, #F7971E, #FFD200); }
+  .hero-card.cat5::before { background: linear-gradient(90deg, #43C6AC, #191654); }
+
+  .hero-card:hover { transform: translateY(-6px); box-shadow: 0 14px 32px rgba(0,0,0,0.15); }
+
+  .hero-top {
+    display: flex; align-items: center;
+    gap: 14px; padding: 16px 16px 12px;
+  }
+
+  .hero-img-box {
+    width: 80px; height: 90px; flex-shrink: 0;
+    border-radius: 10px; background: #F5F5F5;
+    border: 2px dashed #ddd;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    color: #bbb; font-size: 11px; text-align: center;
+    gap: 4px; overflow: hidden;
+  }
+
+  .hero-img-box img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; }
+
+  .hero-info { flex: 1; }
+  .hero-name   { font-size: clamp(17px, 2.5vw, 20px); color: #222; margin-bottom: 4px; }
+  .hero-period { font-size: 12px; color: #999; margin-bottom: 8px; }
+
+  .hero-tag {
+    font-size: 12px; padding: 3px 10px;
+    border-radius: 20px; display: inline-block; font-weight: bold;
+  }
+
+  .tag-science  { background: #E3F2FD; color: #1565C0; }
+  .tag-art      { background: #F3E5F5; color: #6A1B9A; }
+  .tag-indep    { background: #FFF3E0; color: #E65100; }
+  .tag-king     { background: #E8F5E9; color: #1B5E20; }
+  .tag-invent   { background: #E0F7FA; color: #006064; }
+  .tag-military { background: #EFEBE9; color: #3E2723; }
+  .tag-edu      { background: #E8EAF6; color: #1A237E; }
+  .tag-trade    { background: #FFF8E1; color: #F57F17; }
+  .tag-welfare  { background: #FCE4EC; color: #880E4F; }
+  .tag-child    { background: #F3E5F5; color: #4A148C; }
+  .tag-athlete  { background: #E8F5E9; color: #1B5E20; }
+
+  .hero-desc-area {
+    padding: 10px 16px 16px;
+    border-top: 2px dashed #eee;
+    font-size: clamp(12px, 1.8vw, 14px);
+    color: #666; line-height: 1.7;
+  }
+
+  /* ── IMAGE ZOOM ── */
+  .img-zoom-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.85); z-index: 1000;
+    align-items: center; justify-content: center;
+    cursor: zoom-out;
+  }
+  .img-zoom-overlay.show { display: flex; }
+  .img-zoom-overlay img {
+    max-width: 90vw; max-height: 85vh;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    animation: popIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    cursor: default;
+  }
+  .img-zoom-close {
+    position: fixed; top: 20px; right: 24px;
+    background: rgba(255,255,255,0.2); border: none;
+    border-radius: 50%; width: 44px; height: 44px;
+    font-size: 22px; color: #fff; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    backdrop-filter: blur(4px);
+  }
+  .img-zoom-close:hover { background: rgba(255,255,255,0.35); }
+  .img-zoom-name {
+    position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%);
+    background: rgba(0,0,0,0.6); color: #fff;
+    padding: 8px 20px; border-radius: 50px;
+    font-family: 'Jua', sans-serif; font-size: 16px;
+    backdrop-filter: blur(4px);
+  }
+  /* 이미지에 커서 힌트 */
+  .hero-img-box img, .money-img-box img, .coin-img-box img {
+    cursor: zoom-in;
+  }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.55); z-index: 999;
+    align-items: center; justify-content: center; padding: 20px;
+  }
+
+  .modal-overlay.show { display: flex; }
+
+  .modal-box {
+    background: #fff; border-radius: 28px;
+    max-width: 480px; width: 100%;
+    padding: 32px 28px; position: relative;
+    animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    max-height: 90vh; overflow-y: auto;
+  }
+
+  @keyframes popIn {
+    from { transform: scale(0.7); opacity: 0; }
+    to   { transform: scale(1);   opacity: 1; }
+  }
+
+  .modal-close {
+    position: absolute; top: 16px; right: 16px;
+    background: #f5f5f5; border: none; border-radius: 50%;
+    width: 40px; height: 40px; font-size: 20px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+  }
+
+  .modal-top { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+
+  .modal-img-box {
+    width: 90px; height: 100px; flex-shrink: 0;
+    border-radius: 12px; background: #F5F5F5;
+    border: 2px dashed #ddd;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    color: #bbb; font-size: 11px; text-align: center;
+    gap: 4px; overflow: hidden;
+  }
+
+  .modal-img-box img { width: 100%; height: 100%; object-fit: cover; border-radius: 10px; }
+
+  .modal-name   { font-size: 26px; color: #222; }
+  .modal-period { font-size: 14px; color: #999; margin-top: 4px; }
+
+  .modal-section {
+    background: #F9F9F9; border-radius: 16px;
+    padding: 14px 16px; margin-bottom: 12px;
+  }
+
+  .modal-section h4 { font-size: 15px; color: #555; margin-bottom: 6px; }
+  .modal-section p  { font-size: 14px; color: #333; line-height: 1.8; }
+
+  @media (max-width: 500px) {
+    .money-grid  { grid-template-columns: 1fr; }
+    .heroes-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>💰 우리나라 돈과 위인 알아보기 💰</h1>
+  <p>돈에 그려진 위인을 만나 보아요!</p>
+</header>
+
+<div class="tab-bar">
+  <button class="tab-btn money active" onclick="showTab('money', this)">💵 우리나라 화폐</button>
+  <button class="tab-btn heroes" onclick="showTab('heroes', this)">🌟 우리나라 위인들</button>
+</div>
+
+<div class="content">
+
+  <!-- ═══ TAB 1: 화폐 ═══ -->
+  <div class="tab-panel active" id="tab-money">
+    <div class="section-title-wrap">
+      <span class="section-title orange">💵 우리나라 지폐 속 인물</span>
+    </div>
+
+    <div class="money-grid">
+
+      <div class="money-card">
+        <div class="money-top">
+          <div class="money-img-box">
+            <span style="font-size:26px;">🖼️</span><span>사진 준비 중</span>
+          </div>
+          <div class="money-info">
+            <div class="money-amount">1,000원</div>
+            <div class="money-name">퇴계 이황</div>
+            <span class="money-period">1501년 ~ 1570년</span>
+          </div>
+        </div>
+        <div class="money-body">
+          <div class="money-achievement">조선 시대의 위대한 학자예요. 공부를 열심히 해서 올바르게 사는 방법을 가르쳐 주셨어요. 나라를 사랑하고 부모님께 효도하는 것을 중요하게 여겼어요.</div>
+          <div class="money-fun">지폐 뒷면에는 이황 선생님이 세운 학교인 <strong>도산서원</strong>이 그려져 있어요!</div>
+        </div>
+      </div>
+
+      <div class="money-card">
+        <div class="money-top">
+          <div class="money-img-box">
+            <span style="font-size:26px;">🖼️</span><span>사진 준비 중</span>
+          </div>
+          <div class="money-info">
+            <div class="money-amount">5,000원</div>
+            <div class="money-name">율곡 이이</div>
+            <span class="money-period">1536년 ~ 1584년</span>
+          </div>
+        </div>
+        <div class="money-body">
+          <div class="money-achievement">조선 시대의 훌륭한 학자이자 관리예요. 나라를 더 좋게 만들기 위해 많은 노력을 하셨어요. 임금님께 백성들이 잘 살 수 있는 방법을 알려 드렸어요.</div>
+          <div class="money-fun">이이 선생님의 어머니는 <strong>신사임당</strong>이에요. 어머니와 아들이 함께 지폐에 나온 특별한 사이예요!</div>
+        </div>
+      </div>
+
+      <div class="money-card">
+        <div class="money-top">
+          <div class="money-img-box">
+            <span style="font-size:26px;">🖼️</span><span>사진 준비 중</span>
+          </div>
+          <div class="money-info">
+            <div class="money-amount">10,000원</div>
+            <div class="money-name">세종대왕</div>
+            <span class="money-period">1397년 ~ 1450년</span>
+          </div>
+        </div>
+        <div class="money-body">
+          <div class="money-achievement">조선 시대 임금님이에요. 우리가 지금 사용하는 <strong>한글</strong>을 만드셨어요! 백성들이 글을 읽고 쓸 수 있도록 쉬운 글자를 만들어 주셨어요.</div>
+          <div class="money-fun">한글을 만든 날을 기념하는 <strong>한글날(10월 9일)</strong>은 세종대왕 덕분에 생긴 날이에요!</div>
+        </div>
+      </div>
+
+      <div class="money-card">
+        <div class="money-top">
+          <div class="money-img-box">
+            <span style="font-size:26px;">🖼️</span><span>사진 준비 중</span>
+          </div>
+          <div class="money-info">
+            <div class="money-amount">50,000원</div>
+            <div class="money-name">신사임당</div>
+            <span class="money-period">1504년 ~ 1551년</span>
+          </div>
+        </div>
+        <div class="money-body">
+          <div class="money-achievement">그림과 글씨를 아주 잘 그리고 쓴 조선 시대 여성 예술가예요. 자녀를 훌륭하게 키운 훌륭한 어머니이기도 해요. 여성이 지폐에 나온 최초의 인물이에요!</div>
+          <div class="money-fun">신사임당이 그린 <strong>풀과 벌레 그림</strong>은 지금도 아주 유명해요! 뒷면에는 신사임당의 그림이 있어요.</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="coin-section">
+      <div class="coin-section-title">🪙 우리나라 동전</div>
+      <div class="coins-grid">
+
+        <div class="coin-card-item">
+          <div class="coin-top">
+            <div class="coin-img-box"><span style="font-size:20px;">🖼️</span><span style="font-size:9px;">준비 중</span></div>
+            <div class="coin-info"><div class="coin-amount">10원</div><div class="coin-subject">다보탑</div></div>
+          </div>
+          <div class="coin-body">경주에 있는 유명한 탑이에요. 신라 시대에 만들어진 아름다운 탑이랍니다.</div>
+        </div>
+
+        <div class="coin-card-item">
+          <div class="coin-top">
+            <div class="coin-img-box"><span style="font-size:20px;">🖼️</span><span style="font-size:9px;">준비 중</span></div>
+            <div class="coin-info"><div class="coin-amount">100원</div><div class="coin-subject">이순신 장군</div></div>
+          </div>
+          <div class="coin-body">일본과의 전쟁에서 우리나라를 지킨 영웅 장군이에요. 거북선으로 유명해요!</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ TAB 2: 위인 ═══ -->
+  <div class="tab-panel" id="tab-heroes">
+    <div class="section-title-wrap">
+      <span class="section-title green">🌟 우리나라를 빛낸 위인들</span>
+    </div>
+    <div class="heroes-grid" id="heroes-grid"></div>
+  </div>
+
+</div>
+
+<!-- 이미지 확대 팝업 -->
+<div class="img-zoom-overlay" id="img-zoom" onclick="closeZoom(event)">
+  <button class="img-zoom-close" onclick="document.getElementById('img-zoom').classList.remove('show')">✕</button>
+  <img id="img-zoom-img" src="" alt="">
+  <div class="img-zoom-name" id="img-zoom-name"></div>
+</div>
+
+<script>
+function openZoom(src, name) {
+  document.getElementById('img-zoom-img').src = src;
+  document.getElementById('img-zoom-name').textContent = name;
+  document.getElementById('img-zoom').classList.add('show');
+}
+
+function closeZoom(e) {
+  if (e.target === document.getElementById('img-zoom') || e.target === document.getElementById('img-zoom-img'))
+    document.getElementById('img-zoom').classList.remove('show');
+}
+
+// ESC 키로도 닫기
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    document.getElementById('img-zoom').classList.remove('show');
+    document.getElementById('hero-modal').classList.remove('show');
+  }
+});
+</script>
+<div class="modal-overlay" id="hero-modal" onclick="closeModal(event)">
+  <div class="modal-box">
+    <button class="modal-close" onclick="document.getElementById('hero-modal').classList.remove('show')">✕</button>
+    <div class="modal-top">
+      <div class="modal-img-box">
+        <span style="font-size:26px;">🖼️</span>
+        <span>사진 준비 중</span>
+      </div>
+      <div>
+        <div class="modal-name" id="modal-name"></div>
+        <div class="modal-period" id="modal-period"></div>
+      </div>
+    </div>
+    <div class="modal-section">
+      <h4>📖 어떤 분인가요?</h4>
+      <p id="modal-desc"></p>
+    </div>
+    <div class="modal-section">
+      <h4>🏆 어떤 일을 하셨나요?</h4>
+      <p id="modal-achievement"></p>
+    </div>
+  </div>
+</div>
+
+<script>
+const heroes = [
+  /* ── 통일신라 ── */
+  {
+    name: "원효", period: "617 ~ 686년", cat: "cat2",
+    tag: "스님", tagClass: "tag-edu",
+    desc: "통일신라 시대의 유명한 스님이에요. 누구에게나 친절하게 다가간 분이에요.",
+    achievement: "옛날에는 절에 다니는 사람만 불교를 배울 수 있었어요. 원효 스님은 '공부는 누구나 할 수 있어!'라고 생각해서, 마을 곳곳을 돌아다니며 노래를 부르고 춤을 추면서 글을 모르는 사람들에게도 쉽게 가르쳐 주었어요. 어렵고 높은 곳에만 있지 않고 직접 사람들 곁으로 간 따뜻한 마음을 배울 수 있어요."
+  },
+  {
+    name: "장보고", period: "?년 ~ 846년", cat: "cat2",
+    tag: "무역가", tagClass: "tag-trade",
+    desc: "통일신라 시대에 바다를 무대로 꿈을 펼친 분이에요. '바다의 왕'이라고 불렸어요.",
+    achievement: "장보고는 신분이 낮아 높은 벼슬에 오를 수 없었어요. 하지만 포기하지 않고 바다로 나가 자신만의 길을 찾았어요. 해적을 없애 바다를 안전하게 만들고, 우리나라와 중국, 일본이 사이좋게 물건을 사고팔 수 있게 했어요. 내 처지를 탓하지 않고 도전하는 자세를 배울 수 있어요."
+  },
+  /* ── 고려 ── */
+  {
+    name: "문익점", period: "1329 ~ 1398년", cat: "cat2",
+    tag: "학자", tagClass: "tag-edu",
+    desc: "고려 시대의 학자예요. 백성들을 위해 작은 씨앗 하나를 소중히 가져온 분이에요.",
+    achievement: "옛날 우리나라 사람들은 겨울에 입을 따뜻한 옷이 부족했어요. 문익점 선생님은 중국에서 목화씨를 몰래 붓 뚜껑에 숨겨 가져왔어요. 그 작은 씨앗 덕분에 많은 백성들이 따뜻한 솜옷을 입을 수 있게 되었어요. 어려운 사람들을 도우려는 마음과 포기하지 않는 실천이 얼마나 중요한지 배울 수 있어요."
+  },
+  /* ── 조선 ── */
+  {
+    name: "장영실", period: "약 1385년 ~ ?년", cat: "cat3",
+    tag: "발명가", tagClass: "tag-invent",
+    desc: "조선 시대의 뛰어난 발명가예요. 신분이 낮아도 재능과 노력으로 인정받은 분이에요.",
+    achievement: "장영실은 원래 신분이 아주 낮은 노비였어요. 하지만 만드는 것을 너무 좋아해서 포기하지 않고 계속 공부하고 연구했어요. 결국 세종대왕이 그 재능을 알아보고 함께 물시계, 해시계, 측우기 같은 훌륭한 도구들을 만들었어요. 내가 좋아하는 일을 꾸준히 하다 보면 언젠가 꼭 인정받을 수 있다는 것을 배울 수 있어요."
+  },
+  {
+    name: "허준", period: "1539 ~ 1615년", cat: "cat2",
+    tag: "의사", tagClass: "tag-science",
+    desc: "조선 시대의 훌륭한 의사예요. 아픈 사람이라면 누구든 돕고 싶어 한 분이에요.",
+    achievement: "옛날에는 약이 너무 비싸서 가난한 사람들은 아파도 고칠 수가 없었어요. 허준 선생님은 '모든 사람이 병을 고칠 수 있어야 한다'고 생각했어요. 그래서 우리 주변에서 쉽게 구할 수 있는 풀과 나무뿌리로 병을 고치는 방법을 모아 '동의보감'이라는 책을 만들었어요. 돈이 있든 없든 모두를 소중히 여기는 마음을 배울 수 있어요."
+  },
+  {
+    name: "김홍도", period: "1745년 ~ ?년", cat: "cat3",
+    tag: "화가", tagClass: "tag-art",
+    desc: "조선 시대의 뛰어난 화가예요. 평범한 사람들의 일상을 사랑한 분이에요.",
+    achievement: "김홍도는 임금님의 그림도 그렸지만, 씨름하는 아이들, 서당에서 혼나는 학생, 춤추는 사람들처럼 우리 주변의 평범한 모습을 그림에 담는 것을 더 좋아했어요. 멋진 것보다 진짜 삶의 모습이 더 소중하다고 생각했어요. 내 주변의 평범한 것들에서 아름다움을 찾는 눈을 배울 수 있어요."
+  },
+  {
+    name: "김만덕", period: "1739 ~ 1812년", cat: "cat3",
+    tag: "나눔 실천가", tagClass: "tag-welfare",
+    desc: "조선 시대 제주도의 여성 상인이에요. 어렵게 번 돈을 모두 이웃을 위해 쓴 분이에요.",
+    achievement: "김만덕 할머니는 어릴 때 부모님을 잃고 아주 힘들게 살았어요. 오랜 노력 끝에 큰 상인이 되었는데, 제주도에 큰 가뭄이 들어 사람들이 굶주리자 자신이 가진 돈을 모두 털어 쌀을 사서 나누어 주었어요. 내가 힘들었던 기억이 있기에 더 따뜻하게 남을 도울 수 있다는 것을 배울 수 있어요."
+  },
+  {
+    name: "정약용", period: "1762 ~ 1836년", cat: "cat3",
+    tag: "학자·발명가", tagClass: "tag-invent",
+    desc: "조선 시대의 뛰어난 학자예요. 배운 것을 직접 실천으로 옮긴 분이에요.",
+    achievement: "정약용 선생님은 책만 읽는 학자가 아니었어요. '어떻게 하면 백성들이 더 편하게 살 수 있을까?' 늘 고민하며 거중기, 배다리 같은 도구를 직접 발명했어요. 억울하게 먼 곳으로 쫓겨나서도 포기하지 않고 500권이 넘는 책을 썼어요. 힘든 상황에서도 꿈을 잃지 않는 자세를 배울 수 있어요."
+  },
+  {
+    name: "안용복", period: "?년 ~ ?년", cat: "cat1",
+    tag: "나라 지킴이", tagClass: "tag-military",
+    desc: "조선 시대의 평범한 어부예요. 용기 있게 옳은 말을 한 분이에요.",
+    achievement: "안용복은 그냥 물고기를 잡던 평범한 어부였어요. 일본 사람들이 우리나라 땅인 독도에 자꾸 들어오자, 무서웠지만 일본까지 직접 찾아가서 '독도는 우리 땅입니다!'라고 당당하게 말했어요. 높은 사람이 아니어도, 옳은 일이라면 용기 있게 말할 수 있다는 것을 배울 수 있어요."
+  },
+  /* ── 근대 ── */
+  {
+    name: "안중근", period: "1879 ~ 1910년", cat: "cat4",
+    tag: "독립운동가", tagClass: "tag-indep",
+    desc: "우리나라를 빼앗은 일본에 맞서 싸운 독립운동가예요. 평화를 누구보다 사랑한 분이에요.",
+    achievement: "안중근 의사는 단순히 싸우는 것이 목적이 아니었어요. 한국, 중국, 일본이 서로 도우며 평화롭게 살아야 한다는 생각을 가지고 있었어요. 감옥 안에서도 글을 쓰고 생각을 정리할 만큼 깊이 생각하는 분이었어요. 옳은 일을 위해 용감하게 행동하되, 평화를 먼저 생각하는 자세를 배울 수 있어요."
+  },
+  {
+    name: "안창호", period: "1878 ~ 1938년", cat: "cat4",
+    tag: "교육자·독립운동가", tagClass: "tag-indep",
+    desc: "우리나라의 독립과 교육을 위해 평생 노력한 분이에요. 호는 도산이에요.",
+    achievement: "안창호 선생님은 늘 이렇게 말씀하셨어요. '거짓말하지 말자. 정직하게 살자. 작은 일도 최선을 다하자.' 학교를 세워 많은 아이들을 가르쳤고, 나라를 되찾기 위해 끝까지 노력했어요. 크고 대단한 일이 아니어도 매일 정직하고 성실하게 사는 것이 가장 중요하다는 것을 배울 수 있어요."
+  },
+  {
+    name: "방정환", period: "1899 ~ 1931년", cat: "cat5",
+    tag: "어린이 운동가", tagClass: "tag-child",
+    desc: "어린이를 세상에서 가장 소중한 존재로 여긴 분이에요.",
+    achievement: "옛날에는 어린이들이 어른들의 심부름이나 하는 존재로 여겨졌어요. 방정환 선생님은 '어린이는 나라의 미래!'라고 외치며 어린이도 존중받아야 한다고 했어요. 어린이를 위한 잡지 『어린이』를 만들고, 5월 5일을 어린이날로 만들었어요. 나를 포함해 모든 친구들이 소중하다는 것을 배울 수 있어요."
+  },
+  {
+    name: "유관순", period: "1902 ~ 1920년", cat: "cat4",
+    tag: "독립운동가", tagClass: "tag-indep",
+    desc: "우리나라가 일본에 빼앗겼을 때 나라를 되찾기 위해 나선 학생이에요.",
+    achievement: "유관순 언니는 여러분보다 조금 많은 나이인 학생이었어요. 나라가 빼앗기자 무서웠지만 '이건 잘못된 일이야!'라고 용기 있게 외쳤어요. 감옥에 갇혀 고통스러웠지만 끝까지 포기하지 않았어요. 옳은 일 앞에서는 나이가 어려도 용기 있게 행동할 수 있다는 것을 배울 수 있어요."
+  },
+  {
+    name: "윤봉길", period: "1908 ~ 1932년", cat: "cat4",
+    tag: "독립운동가", tagClass: "tag-indep",
+    desc: "우리나라를 빼앗은 일본에 맞서 싸운 독립운동가예요. 나라를 위해 목숨을 바친 분이에요.",
+    achievement: "윤봉길 의사는 농촌에서 농민들을 가르치며 살던 평범한 청년이었어요. '배운 사람이 나서야 나라가 바뀐다'고 생각하며 스스로 독립운동에 뛰어들었어요. 자신의 안전보다 나라와 사람들을 먼저 생각한 분이에요. 나보다 다른 사람을 먼저 생각하는 마음을 배울 수 있어요."
+  },
+  {
+    name: "손기정", period: "1912 ~ 2002년", cat: "cat5",
+    tag: "운동선수", tagClass: "tag-athlete",
+    desc: "1936년 베를린 올림픽에서 마라톤 금메달을 딴 운동선수예요. 일제 강점기에 우리 민족에게 희망을 준 분이에요.",
+    achievement: "손기정 선생님은 나라를 빼앗긴 상황에서도 포기하지 않고 열심히 달리고 또 달렸어요. 결국 세계에서 가장 큰 스포츠 대회인 올림픽에서 1등을 했어요. 하지만 시상대에서 일장기가 달린 옷을 입어야 했기에 고개를 숙이고 슬퍼했어요. 불리하고 힘든 상황에서도 최선을 다하면 반드시 빛나는 순간이 온다는 것을 배울 수 있어요."
+  }
+];
+
+function init() {
+  const grid = document.getElementById('heroes-grid');
+  heroes.forEach((h, i) => {
+    const card = document.createElement('div');
+    card.className = `hero-card ${h.cat}`;
+    const imgContent = h.img
+      ? `<img src="${h.img}" alt="${h.name}" onclick="event.stopPropagation(); openZoom('${h.img}', '${h.name}')">`
+      : `<span style="font-size:22px;">🖼️</span><span>사진 준비 중</span>`;
+    card.innerHTML = `
+      <div class="hero-top">
+        <div class="hero-img-box">${imgContent}</div>
+        <div class="hero-info">
+          <div class="hero-name">${h.name}</div>
+          <div class="hero-period">${h.period}</div>
+          <span class="hero-tag ${h.tagClass}">${h.tag}</span>
+        </div>
+      </div>
+      <div class="hero-desc-area">${h.desc}</div>
+    `;
+    card.onclick = () => openModal(i);
+    grid.appendChild(card);
+  });
+}
+
+function showTab(name, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(`tab-${name}`).classList.add('active');
+  btn.classList.add('active');
+}
+
+function openModal(i) {
+  const h = heroes[i];
+  document.getElementById('modal-name').textContent = h.name;
+  document.getElementById('modal-period').textContent = h.period;
+  document.getElementById('modal-desc').textContent = h.desc;
+  document.getElementById('modal-achievement').textContent = h.achievement;
+  document.getElementById('hero-modal').classList.add('show');
+}
+
+function closeModal(e) {
+  if (e.target === document.getElementById('hero-modal'))
+    document.getElementById('hero-modal').classList.remove('show');
+}
+
+init();
+</script>
+<footer style="text-align:center; padding: 24px 16px; font-size: 13px; color: #aaa; border-top: 1px solid #eee; margin-top: 20px;">
+  위인 이미지는 Google Gemini AI로 제작하였습니다. ✦ 마크는 Google Gemini 생성 이미지 표시입니다. | 위인 설명 참고: 우리역사넷 (국사편찬위원회)
+</footer>
+</body>
+</html>
