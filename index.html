@@ -97,6 +97,21 @@
   .tag-science  { background:#E3F2FD; color:#1565C0; }
   .hero-desc-area { padding:10px 16px 16px; border-top:2px dashed #eee; font-size:clamp(12px,1.8vw,14px); color:#666; line-height:1.7; }
 
+  /* ── COIN ── */
+  .coin-grid { display:grid; grid-template-columns:repeat(2, 1fr); gap:16px; }
+  .coin-card { background:#fff; border-radius:20px; box-shadow:var(--card-shadow); padding:20px 16px; text-align:center; transition:transform 0.25s; }
+  .coin-card:hover { transform:translateY(-4px); }
+  .coin-img-box {
+    width:90px; height:90px; border-radius:50%; margin:0 auto 12px;
+    background:#F5F5F5; border:2px dashed #ddd;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    color:#bbb; font-size:10px; text-align:center; overflow:hidden;
+  }
+  .coin-img-box img { width:100%; height:100%; object-fit:cover; border-radius:50%; cursor:zoom-in; }
+  .coin-amount  { font-size:22px; color:#FF8C00; margin-bottom:4px; }
+  .coin-symbol  { font-size:13px; color:#888; margin-bottom:8px; }
+  .coin-desc    { font-size:13px; color:#555; line-height:1.7; }
+
   /* ── IMAGE ZOOM ── */
   .img-zoom-overlay {
     display:none; position:fixed; inset:0;
@@ -147,6 +162,11 @@
       <span class="section-title orange">💵 우리나라 지폐 속 인물</span>
     </div>
     <div class="money-grid" id="money-grid"></div>
+
+    <div class="section-title-wrap" style="margin-top:40px;">
+      <span class="section-title orange">🪙 우리나라 동전</span>
+    </div>
+    <div class="coin-grid" id="coin-grid"></div>
   </div>
 
   <div class="tab-panel" id="tab-heroes">
@@ -266,6 +286,22 @@ const heroes = [
     achievement:"손기정 선생님은 나라를 빼앗긴 상황에서도 포기하지 않고 열심히 달리고 또 달렸어요. 결국 세계에서 가장 큰 스포츠 대회인 올림픽에서 1등을 했어요. 하지만 시상대에서 일장기가 달린 옷을 입어야 했기에 고개를 숙이고 슬퍼했어요. 불리하고 힘든 상황에서도 최선을 다하면 반드시 빛나는 순간이 온다는 것을 배울 수 있어요." }
 ];
 
+/* ── 동전 데이터 ── */
+const coins = [
+  { amount:"1원",   symbol:"무궁화",    img:"1원.png",
+    desc:"우리나라를 대표하는 꽃이에요. 어디서나 잘 자라고 3달 동안 매일 새로운 꽃을 피워요. 열심히 일하는 우리 민족의 모습을 닮았다고 해서 우리나라의 상징이 되었어요." },
+  { amount:"5원",   symbol:"거북선",    img:"5원.png",
+    desc:"이순신 장군이 전쟁에서 사용한 특별한 배예요. 배 위를 덮개로 덮어 안에서 안전하게 싸울 수 있었어요. 덕분에 우리 군인들이 적의 공격을 피하며 싸울 수 있었답니다." },
+  { amount:"10원",  symbol:"다보탑",    img:"10원.png",
+    desc:"경주 불국사에 있는 우리나라 국보 제20호예요. 신라 시대에 만들어진 아름다운 탑으로, 모양이 매우 독특하고 예술적이에요. 우리나라 석탑 예술의 최고 작품으로 손꼽혀요." },
+  { amount:"50원",  symbol:"벼이삭",    img:"50원.png",
+    desc:"우리가 먹는 밥이 되는 쌀이 달린 벼의 모습이에요. 쌀은 우리나라 사람들이 오랫동안 먹어온 가장 중요한 먹거리예요. 농사가 우리 삶에 얼마나 소중한지 보여줘요." },
+  { amount:"100원", symbol:"이순신 장군", img:"100원.png",
+    desc:"조선 시대의 훌륭한 장군이에요. 일본이 쳐들어왔을 때 학익진이라는 특별한 전법으로 한산도 앞바다에서 일본군을 크게 물리쳤어요. 여러 전쟁을 모두 승리로 이끈 영웅이에요." },
+  { amount:"500원", symbol:"학(두루미)", img:"500원.png",
+    desc:"우리나라를 대표하는 아름다운 새예요. 하얗고 우아한 모습이 인상적이에요. 나라가 더욱 발전하고 잘 살게 되기를 바라는 마음을 담아 동전에 새겼어요." }
+];
+
 /* ── 렌더링 ── */
 function init() {
   // 화폐 렌더링
@@ -293,6 +329,25 @@ function init() {
         <div class="money-fun">${b.fun}</div>
       </div>`;
     moneyGrid.appendChild(card);
+  });
+
+  // 동전 렌더링
+  const coinGrid = document.getElementById('coin-grid');
+  coins.forEach(c => {
+    const card = document.createElement('div');
+    card.className = 'coin-card';
+    card.innerHTML = `
+      <div class="coin-img-box">
+        <img src="${c.img}" alt="${c.symbol}" onclick="openZoom('${c.img}','${c.amount} ${c.symbol}')"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div style="display:none;flex-direction:column;align-items:center;gap:3px;">
+          <span style="font-size:20px;">🖼️</span><span>준비 중</span>
+        </div>
+      </div>
+      <div class="coin-amount">${c.amount}</div>
+      <div class="coin-symbol">${c.symbol}</div>
+      <div class="coin-desc">${c.desc}</div>`;
+    coinGrid.appendChild(card);
   });
 
   // 위인 렌더링
@@ -369,7 +424,8 @@ init();
 </script>
 
 <footer style="text-align:center;padding:24px 16px;font-size:13px;color:#aaa;border-top:1px solid #eee;margin-top:20px;">
-  위인 이미지는 Google Gemini AI로 제작하였습니다. ✦ 마크는 Google Gemini 생성 이미지 표시입니다. | 위인 설명 참고: 우리역사넷 (국사편찬위원회)
+  위인 이미지는 Google Gemini AI로 제작하였습니다. ✦ 마크는 Google Gemini 생성 이미지 표시입니다.<br>
+  위인 설명 참고: 우리역사넷 (국사편찬위원회)
 </footer>
 </body>
 </html>
